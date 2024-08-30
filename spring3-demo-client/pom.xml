@@ -16,11 +16,13 @@
   <name>spring3-demo</name>
   <description>Spring Boot 3 Observability Demo</description>
   <properties>
-    <java.version>20</java.version>
+    <java.version>21</java.version>
+    <spring-boot.version>3.1.2</spring-boot.version>
     <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
     <opentelemetry-logback-appender.version>1.25.0-alpha</opentelemetry-logback-appender.version>
     <opentelemetry-sdk-logs.version>1.25.0-alpha</opentelemetry-sdk-logs.version>
     <opentelemetry-otlp-exporter-logs.version>1.25.0-alpha</opentelemetry-otlp-exporter-logs.version>
+    <jkube.namespace>hlf-operator</jkube.namespace>
   </properties>
 
   <dependencies>
@@ -127,5 +129,108 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>openshift</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.jkube</groupId>
+            <artifactId>openshift-maven-plugin</artifactId>
+            <version>1.16.2</version>
+            <executions>
+              <execution>
+                <id>fmp</id>
+                <goals>
+                  <goal>resource</goal>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <!--verbose>true</verbose-->
+              <images>
+                <image>
+                    <name>${project.artifactId}:${project.version}</name>
+                    <build>
+                        <dockerFile>${project.basedir}/src/main/docker/Dockerfile</dockerFile>
+                        <assembly>
+                            <mode>dir</mode>
+                            <layers>
+                                <layer>
+                                    <id>assembly</id>
+                                    <fileSets>
+                                        <fileSet>
+                                            <directory>src/main/resources</directory>
+                                            <outputDirectory>conf</outputDirectory>
+                                            <includes>
+                                                <include>*.json</include>
+                                                <include>*.yml</include>
+                                                <include>*.properties</include>
+                                                <include>**/*.key</include>
+                                                <include>**/*.pem</include>
+                                                <include>**/*.crt</include>
+                                            </includes>
+                                        </fileSet>
+                                    </fileSets>
+                                </layer>
+                            </layers>
+                        </assembly>
+                        <tags>
+                            <tag>latest</tag>
+                            <tag>${project.version}</tag>
+                        </tags>
+                    </build>
+                </image>
+              </images>
+              <enricher>
+                  <config>
+                      <jkube-controller>
+                        <name>${project.artifactId}</name>
+                        <type>Deployment</type>                      
+                      </jkube-controller>
+                  </config>
+              </enricher>
+              <resources>
+                <labels>
+                  <all>
+                    <property>
+                      <name>app.kubernetes.io/part-of</name>
+                      <value>http-api-example</value>
+                    </property>
+                    <property>
+                      <name>app.kubernetes.io/name</name>
+                      <value>http-api</value>
+                    </property>
+                    <property>
+                      <name>app.kubernetes.io/component</name>
+                      <value>frontend</value>
+                    </property>
+                    <property>
+                      <name>app.openshift.io/runtime</name>
+                      <value>rh-spring-boot</value>
+                    </property>
+                    <property>
+                      <name>app.openshift.io/runtime-version</name>
+                      <value>${spring-boot.version}</value>
+                    </property>
+                  </all>
+                </labels>
+                <annotations>
+                  <all>
+                    <property>
+                      <name>app.kubernetes.io/vcs-uri</name>
+                      <value>git@github.com:snowdrop/rest-http-example.git</value>
+                    </property>
+                  </all>
+                </annotations>
+              </resources>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

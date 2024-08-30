@@ -1,0 +1,46 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: ${project.artifactId}
+  namespace: ${jkube.namespace}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: ${project.artifactId}
+  template:
+    metadata:
+      annotations: 
+        sidecar.opentelemetry.io/inject: 'true'
+      labels:
+        deployment: ${project.artifactId}
+    spec:
+      serviceAccount: collector
+      containers:
+        - name: ${project.artifactId}
+          image: >-
+            ${project.artifactId}:${project.version}
+          env:
+            - name: OTEL_METRICS_EXPORTER
+              value: none
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://localhost:4317
+            - name: OTEL_SERVICE_NAME
+              value: ${project.artifactId}
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      serviceAccountName: collector
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

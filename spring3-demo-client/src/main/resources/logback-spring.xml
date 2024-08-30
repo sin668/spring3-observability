@@ -47,8 +47,8 @@
   <root level="INFO">    
     <appender-ref ref="CONSOLE" />
     <appender-ref ref="APPLICATION-LOG-FILE" />
-    <appender-ref ref="OPEN_TELEMETRY" />
-    <!-- <appender-ref ref="CONSOLE-JSON" />            Log output to console in JSON format. -->
+    <!-- <appender-ref ref="OPEN_TELEMETRY" />
+    <appender-ref ref="CONSOLE-JSON" />            Log output to console in JSON format. -->
     <!-- <appender-ref ref="CONSOLE-JSON-SAP" /> -->        <!-- Log output to console in SAP-specific JSON format. -->
     <!-- <appender-ref ref="CONSOLE-JSON-CUSTOMIZED" /> --> <!-- Log output to console in custom JSON format. -->
   </root>
