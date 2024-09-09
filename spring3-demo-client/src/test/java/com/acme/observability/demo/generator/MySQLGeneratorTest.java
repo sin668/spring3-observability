@@ -49,7 +49,7 @@ public class MySQLGeneratorTest extends BaseGeneratorTest {
     /**
      * 初始化包配置
      */
-    private static PackageConfig initPackageConfig(String projectPath,String moduleName) {
+    private static PackageConfig initPackageConfig(String projectPath, String moduleName) {
         // Props props = new Props("generator.properties");
         // Map<OutputFile, String> pathInfo = new HashMap();
         // pathInfo.put(OutputFile.mapperXml, projectPath + "/src/main/resources/mapper/" + moduleName);
@@ -72,9 +72,10 @@ public class MySQLGeneratorTest extends BaseGeneratorTest {
     /**
      * 初始化策略配置
      */
-    private static StrategyConfig initStrategyConfig() {
+    private static StrategyConfig initStrategyConfig(String tableName) {
         return new StrategyConfig.Builder()
-                .likeTable(new LikeTable("district"))
+                // .likeTable(new LikeTable("district"))
+                .addInclude(tableName)
                 .entityBuilder()
                 .superClass(BaseEntity.class)
                 .enableLombok()
@@ -118,6 +119,7 @@ public class MySQLGeneratorTest extends BaseGeneratorTest {
     public void testSimple() {
         String projectPath = System.getProperty("user.dir");
         String moduleName = "demo";
+        String tableName = "role";
         AutoGenerator generator = new AutoGenerator(DATA_SOURCE_CONFIG);
         // generator.global(globalConfig().build());
         generator.global(initGlobalConfig(projectPath));
@@ -126,7 +128,7 @@ public class MySQLGeneratorTest extends BaseGeneratorTest {
         // 自定义配置
         // generator.injection(initInjectionConfig(projectPath));
         // generator.strategy(strategyConfig().build());
-        generator.strategy(initStrategyConfig());
+        generator.strategy(initStrategyConfig(tableName));
         generator.execute();
     }
 }
