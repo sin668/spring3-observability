@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import com.acme.observability.orm.entity.BaseEntity;
-
+import com.acme.observability.orm.mapper.BaseMapperX;
 
 /**
  * MySQL 代码生成
@@ -86,27 +86,49 @@ public class MySQLGeneratorTest extends BaseGeneratorTest {
                 // .addTableFills(new Column("create_time", FieldFill.INSERT))
                 // .addTableFills(new Property("updateTime", FieldFill.INSERT_UPDATE))
                 // .idType(IdType.AUTO)
-                .formatFileName("%sDO")
+                // .formatFileName("%sDO")
                 .controllerBuilder()
                 .enableRestStyle()
                 .mapperBuilder()
                 .enableMapperAnnotation()
+                .superClass(BaseMapperX.class)
+                .build();
+    }
+
+    /**
+     * 初始化模板配置
+     * 可以对controller、service、entity模板进行配置
+     */
+    private static TemplateConfig initTemplateConfig() {
+        return new TemplateConfig.Builder()
+                .entity("/templates/entity.java")
+                .service("/templates/service.java")
+                .serviceImpl("/templates/serviceImpl.java")
+                .mapper("/templates/mapper.java")
+                .xml("/templates/mapper.xml")
+                .controller("/templates/controller.java")
                 .build();
     }
 
     /**
     * 初始化自定义配置
     */
-    private static InjectionConfig initInjectionConfig(String projectPath) {
+    private static InjectionConfig initInjectionConfig(String moduleName) {
         /**自定义生成模板参数**/
         Map<String,Object> customMap = new HashMap<>();
-        // customMap.put("dto", PARENT_PATH + ".dto");
-        customMap.put("vo", PARENT_PATH + ".vo");
+        customMap.put("dto", PARENT_PATH + "." + moduleName + ".dto");
+        customMap.put("vo", PARENT_PATH + "." + moduleName + ".vo");
+        customMap.put("page", PARENT_PATH + "." + moduleName + ".vo");
+        customMap.put("convert", PARENT_PATH + "." + moduleName + ".convert");
         List<CustomFile> customFiles = new ArrayList<>();
-        // customFiles.add(new CustomFile.Builder().packageName("dto").fileName("DTO.java")
-        //                     .templatePath("/templates/dto.java.vm").enableFileOverride().build());
+        customFiles.add(new CustomFile.Builder().packageName("dto").fileName("DTO.java")
+                            .templatePath("/templates/DTO.java.vm").enableFileOverride().build());
         customFiles.add(new CustomFile.Builder().packageName("vo").fileName("VO.java")
-                            .templatePath("/templates/vo.java.vm").enableFileOverride().build());
+                            .templatePath("/templates/VO.java.vm").enableFileOverride().build());
+        customFiles.add(new CustomFile.Builder().packageName("vo").fileName("PageVO.java")
+                            .templatePath("/templates/PageVO.java.vm").enableFileOverride().build());
+        customFiles.add(new CustomFile.Builder().packageName("convert").fileName("Convert.java")
+                            .templatePath("/templates/Convert.java.vm").enableFileOverride().build());
         // 自定义配置
         return new InjectionConfig.Builder()
                 .customMap(customMap)
@@ -125,8 +147,10 @@ public class MySQLGeneratorTest extends BaseGeneratorTest {
         generator.global(initGlobalConfig(projectPath));
         // 包配置，如模块名、实体、mapper、service、controller等
         generator.packageInfo(initPackageConfig(projectPath, moduleName));
+        // 模板配置
+        generator.template(initTemplateConfig());
         // 自定义配置
-        // generator.injection(initInjectionConfig(projectPath));
+        generator.injection(initInjectionConfig(moduleName));
         // generator.strategy(strategyConfig().build());
         generator.strategy(initStrategyConfig(tableName));
         generator.execute();

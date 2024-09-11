@@ -1,4 +1,4 @@
-package com.acme.observability.demo.client;
+package com.acme.observability.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,0 +1,30 @@
+package ${package.Mapper};
+
+import ${package.Entity}.${entity};
+import ${cfg.page}.${entity}PageVO;
+import ${superMapperClassPackage};
+#if(${mapperAnnotationClass})
+import ${mapperAnnotationClass.name};
+#end
+import com.acme.observability.orm.entity.PageResult;
+import com.acme.observability.orm.mapper.LambdaQueryWrapperX;
+
+/**
+ * $!{table.comment} Mapper 接口
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${mapperAnnotationClass})
+@${mapperAnnotationClass.simpleName}
+#end
+#if(${kotlin})
+interface ${table.mapperName} : ${superMapperClass}<${entity}>
+#else
+public interface ${table.mapperName} extends ${superMapperClass}<${entity}> {
+
+    default PageResult<${entity}> selectPage(${entity}PageVO pageVO) {
+        return selectPage(pageVO, new LambdaQueryWrapperX<${entity}>());
+    }
+}
+#end

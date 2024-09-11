@@ -1,6 +1,11 @@
 spring:
   application:
     name: spring-client
+  datasource:
+    url: jdbc:mysql://172.18.188.97:3306/ycp4_sys?useUnicode=true&amp&characterEncoding=UTF-8&serverTimezone=GMT%2b8
+    username: dba
+    password: Ycp12345!!
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
 server:
   port: 8080

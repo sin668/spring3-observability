@@ -1,0 +1,61 @@
+package ${package.ServiceImpl};
+
+import ${package.Entity}.${entity};
+import ${cfg.vo}.${entity}VO;
+import ${cfg.page}.${entity}PageVO;
+import ${cfg.convert}.${entity}Convert;
+import ${package.Mapper}.${table.mapperName};
+#if(${table.serviceInterface})
+import ${package.Service}.${table.serviceName};
+#end
+import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.acme.observability.orm.entity.PageResult;
+
+/**
+ * $!{table.comment} 服务实现类
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ${table.serviceImplName} implements ${table.serviceName} {
+
+    private final ${entity}Mapper ${table.entityPath}Mapper;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long create(${entity}VO createVO) {
+        ${entity} ${table.entityPath} = ${entity}Convert.INSTANCE.convert(createVO);
+        ${table.entityPath}Mapper.insert(${table.entityPath});
+        return ${table.entityPath}.getId();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(${entity}VO updateVO) {
+        ${entity} ${table.entityPath} = ${entity}Convert.INSTANCE.convert(updateVO);
+        ${table.entityPath}Mapper.updateById(${table.entityPath});
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(Long id) {
+        ${table.entityPath}Mapper.deleteById(id);
+    }
+
+    @Override
+    public ${entity} get(Long id) {
+        return ${table.entityPath}Mapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<${entity}> page(${entity}PageVO pageVO) {
+        return ${table.entityPath}Mapper.selectPage(pageVO);
+    }
+
+}
